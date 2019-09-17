@@ -26,8 +26,7 @@ def import_file(file_name):
         for row in csv_r:
             # skip the titles
             if col_title:
-                num_q = ((len(row) - 1) // 2)
-                print('Number of questions: {}'.format(num_q))
+                # num_q = ((len(row) - 1) // 2)
                 col_title = False
             else:
                 netid = row.pop(0)
@@ -112,23 +111,39 @@ Score: {}
 
     return sakai_comment, score
 
-def prepare_data(l_s):
+def prepare_and_send_data(l_s):
     '''gets the sakai comment and score ready for injection'''
+    comments, scores = [], []
     for _k, _v in l_s.items():
         sakai_comment, score = build_comment(_k, _v)
+        comments.append(sakai_comment)
+        scores.append(score)
 
-def export_file(file_name, imported_fn):
+    export_file('demo/export_temp.csv', 'johnson', comments, scores)
+
+def export_file(file_name, imported_fn, s_c, _s):
     '''
     appends the data loaded in to the supplied file
     '''
-    # with open(file_name, 'rw') as exp, open('temp.csv', 'rw') as temp:
-    #     csv_exp = csv.reader(exp, delimiter=',')
-    #     for row in csv_exp:
+    with open(file_name, 'r') as exp, open('temp.csv','w') as temp:
+        csv_exp = csv.reader(exp, delimiter=',')
+        csv_writer = csv.writer(temp, delimiter=',')
+        header = True
+        for row in csv_exp:
+            row = list(filter(None, row))
+            if header:
+                # eliminate empty fields
+                header = False
+            else:
+                comment = s_c.pop(0)
+                score = _s.pop(0)
+                row.append('<{}> [{}]'.format(imported_fn, score))
+                row.append('{} <{}>'.format(comment, imported_fn))
 
-
-
+            csv_writer.writerow(row)
 
 if __name__ == '__main__':
     LOADED_STUDENTS = import_file('demo/import_temp.csv')
     LOADED_STUDENTS = mod_data(LOADED_STUDENTS)
-    prepare_data(LOADED_STUDENTS)
+    # ugly, but prepare data also sends the data lol
+    prepare_and_send_data(LOADED_STUDENTS)
