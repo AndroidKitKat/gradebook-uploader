@@ -1,0 +1,7 @@
+netid: meiseman
+
+Score: 95
+
+Comments:
+  Problem 1:  -1; blah blah
+  Problem 4:  -4; stuff and things
