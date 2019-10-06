@@ -1,0 +1,26 @@
+Student ID,Student Name,<File Name> [100],* <File Name>
+meiseman,Michael Eisemann,<demo/export_temp.csv>[100],"netid: example
+Score: 100
+
+<demo/export_temp.csv>"
+zenciso,Zephan Enciso,<demo/export_temp.csv>[95],"netid: meiseman
+Score: 95
+
+Comments: 
+    Problem 1:  -1; blah blah
+    Problem 5:  -4; stuff and things
+<demo/export_temp.csv>"
+sbattalio,Samuel Battalio,<demo/export_temp.csv>[100],"netid: zenciso
+Score: 100
+
+<demo/export_temp.csv>"
+pnui,Peter Bui,<demo/export_temp.csv>[100],"netid: sbattalio
+Score: 100
+
+<demo/export_temp.csv>"
+sjoshi2,Siddharth Joshi,<demo/export_temp.csv>[95],"netid: pnui
+Score: 95
+
+Comments: 
+    Problem 2:  -5; YEET
+<demo/export_temp.csv>"

@@ -4,7 +4,7 @@
 '''
 
 import csv
-
+from pprint import pprint
 def import_file(file_name):
     '''
     takes a file and loads it into a structure we can use
@@ -138,9 +138,9 @@ def export_file(file_in, file_out, s_c, _s):
             else:
                 comment = s_c.pop(0)
                 score = _s.pop(0)
-                row.append()
-            
-
+                row.append('<{}>[{}]'.format(file_in, score))
+                row.append('{}<{}>'.format(comment, file_in))
+            csv_fo.writerow(row)
 
 
     # with open(file_name, 'r+') as exp, open('temp.xls', 'r+') as temp:
