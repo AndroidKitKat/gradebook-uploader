@@ -202,3 +202,5 @@ if __name__ == '__main__':
     LOADED_STUDENTS = mod_data(LOADED_STUDENTS)
     # ugly, but prepare data also sends the data lol
     prepare_and_send_data(LOADED_STUDENTS)
+    # clean up
+    os.remove('passthru.csv')
