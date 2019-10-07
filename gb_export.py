@@ -10,6 +10,7 @@ import os
 OUTFILE = 'output.csv'
 INFILE = None
 OUTFILE_WO_EXTENSION = None
+NAMES = []
 
 def usage(status=0):
     '''Display usage information and exit with specified status '''
@@ -25,10 +26,11 @@ def import_file(file_name):
     import file structure found in demo/import_temp.csv
 
     student dict structure: {
-        netid1: [q1_comment, q1_deduct, q2_comment, q2_deduct, ..., qN_comment, qN_deduct]
-        netid2: [q1_comment, q1_deduct, q2_comment, q2_deduct, ..., qN_comment, qN_deduct]
+        netid1: [name1, q1_comment, q1_deduct, q2_comment, q2_deduct, ..., qN_comment, qN_deduct]
+        netid2: [name2, q1_comment, q1_deduct, q2_comment, q2_deduct, ..., qN_comment, qN_deduct]
+        netid3: [name3, q1_comment, q1_deduct, q2_comment, q2_deduct, ..., qN_comment, qN_deduct]
         ...
-        netidN: [q1_comment, q1_deduct, q2_comment, q2_deduct, ..., qN_comment, qN_deduct]
+        netidN: [nameN, q1_comment, q1_deduct, q2_comment, q2_deduct, ..., qN_comment, qN_deduct]
     }
 
     '''
@@ -52,17 +54,19 @@ def mod_data(l_s):
     Alters the data from import to conform to desired output
 
     If a deduct is empty, turn field into 0
+    also builds a master list of names
     '''
     for _k, _v in l_s.items():
+        #skims the names off the top
+        NAMES.append(_v.pop(0))
         counter = 0
         for i, item in enumerate(_v):
             # change score to 0 if empty
             if counter % 2 != 0 and not item:
                 _v[i] = '0'
-            elif not item:
+            elif not item: # i don't know what this does
                 _v[i] = 'No comment provided'
             counter += 1
-
     return l_s
 
 def calc_score(comments):
@@ -133,7 +137,7 @@ def generate_passthru(l_s):
         header_row = ['Student ID', 'Student Name', OUTFILE_WO_EXTENSION + ' [100]', '* ' + OUTFILE_WO_EXTENSION]
         csv_pt.writerow(header_row)
         for netid, junk in l_s.items():
-            csv_pt.writerow([netid, ' '])
+            csv_pt.writerow([netid, NAMES.pop(0)])
 
 
 
