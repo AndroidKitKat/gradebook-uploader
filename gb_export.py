@@ -4,7 +4,20 @@
 '''
 
 import csv
-from pprint import pprint
+import sys # fuck argparse
+import os
+
+OUTFILE = 'output.csv'
+INFILE = None
+OUTFILE_WO_EXTENSION = None
+
+def usage(status=0):
+    '''Display usage information and exit with specified status '''
+    print('''Usage: {} [options] gradebook
+    -o file     Output file name (default: output.csv)
+    '''.format(os.path.basename(sys.argv[0]))
+    )
+    sys.exit(status)
 def import_file(file_name):
     '''
     takes a file and loads it into a structure we can use
@@ -39,7 +52,6 @@ def mod_data(l_s):
     Alters the data from import to conform to desired output
 
     If a deduct is empty, turn field into 0
-    if a comment is empty, turn field into 'No comment provided' (todo make cli option?)
     '''
     for _k, _v in l_s.items():
         counter = 0
@@ -111,6 +123,21 @@ Score: {}
 
     return sakai_comment, score
 
+def generate_passthru(l_s):
+    '''
+    since I am bad and don't want to re-make my export_file
+    this function takes the input file and generates the template for final export
+    '''
+    with open('passthru.csv','w') as _pt:
+        csv_pt = csv.writer(_pt)
+        header_row = ['Student ID', 'Student Name', OUTFILE_WO_EXTENSION + ' [100]', '* ' + OUTFILE_WO_EXTENSION]
+        csv_pt.writerow(header_row)
+        for netid, junk in l_s.items():
+            csv_pt.writerow([netid, ' '])
+
+
+
+
 def prepare_and_send_data(l_s):
     '''gets the sakai comment and score ready for injection'''
     comments, scores = [], []
@@ -119,7 +146,8 @@ def prepare_and_send_data(l_s):
         comments.append(sakai_comment)
         scores.append(score)
 
-    export_file('demo/export_temp.csv', 'temp.csv', comments, scores)
+    generate_passthru(l_s)
+    export_file('passthru.csv', OUTFILE, comments, scores)
 
 def export_file(file_in, file_out, s_c, _s):
     '''
@@ -138,34 +166,35 @@ def export_file(file_in, file_out, s_c, _s):
             else:
                 comment = s_c.pop(0)
                 score = _s.pop(0)
-                row.append('<{}>[{}]'.format(file_in, score))
-                row.append('{}<{}>'.format(comment, file_in))
+                row.append('{}'.format(score))
+                row.append('{}'.format(comment))
             csv_fo.writerow(row)
-
-
-    # with open(file_name, 'r+') as exp, open('temp.xls', 'r+') as temp:
-    #     csv_exp = csv.reader(exp, delimiter=',')
-    #     header = True
-    #     temp_wb = Workbook()
-    #     temp_sheet = temp.wb.add_sheet('Sheet 1')
-    #     for row in csv_exp:
-    #         row = list(filter(None, row))
-    #         if header:
-    #             # eliminate empty fields
-    #             header = False
-    #         else:
-    #             comment = s_c.pop(0)
-    #             score = _s.pop(0)
-
-    #             # row.append('<{}> [{}]'.format(imported_fn, score))
-    #             # row.append('{} <{}>'.format(comment, imported_fn))
-    #         # rows.append(row)
 
 
 
 
 if __name__ == '__main__':
-    LOADED_STUDENTS = import_file('demo/import_temp.csv')
+    # parse command line input
+    args = sys.argv[1:]
+    while len(args) and args[0].startswith('-') and len(args[0]) > 1:
+        arg = args.pop(0)
+        if arg == '-o':
+            OUTFILE = args[0]
+            args.pop(0)
+        elif arg == '-h':
+            usage(0)
+        else:
+            usage(1)
+    # get input file name
+    if len(args) > 0:
+        INFILE = args[0]
+
+    if not INFILE:
+        usage(-1)
+
+    # get outfile without extension
+    OUTFILE_WO_EXTENSION = os.path.splitext(OUTFILE)[0]  
+    LOADED_STUDENTS = import_file(INFILE)
     LOADED_STUDENTS = mod_data(LOADED_STUDENTS)
     # ugly, but prepare data also sends the data lol
     prepare_and_send_data(LOADED_STUDENTS)
